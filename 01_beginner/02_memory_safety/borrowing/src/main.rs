@@ -9,6 +9,18 @@ fn main() {
     let s2 = generate_string();
     println!("{}", s2);
 
+    // Example of creating a string_pointer that can change what it is pointing to
+    let mut str1 = String::from("modifiable");
+    let str2 = String::from("fixed string");
+    let mut str_ptr: &String;
+    str_ptr = &str1;
+    println!("ptr currently points to {str_ptr}");
+    str_ptr = &str2;
+    println!("ptr currently points to {str_ptr}");
+    str1.push_str(" string");
+    str_ptr = &str1;
+    println!("ptr currently points to {str_ptr}");
+
 }
 
 fn generate_string() -> String {
@@ -16,7 +28,7 @@ fn generate_string() -> String {
 }
 
 /*
-Example of a dangling reference
+// Example of a dangling reference
 fn generate_string() -> &String {
     let s = String::from("Ferris");
     &s // this would lead to a dangling reference
