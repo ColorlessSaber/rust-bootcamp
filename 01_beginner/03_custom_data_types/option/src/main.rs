@@ -22,3 +22,10 @@ fn get_username(user_id: i32) -> Option<String> {
         None
     }
 }
+
+/* The structure of the Option enum.
+enum Option<T> {
+    None,
+    Some(T),
+}
+ */
