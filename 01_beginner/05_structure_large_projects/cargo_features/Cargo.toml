@@ -1,0 +1,7 @@
+[package]
+name = "cargo_features"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+draw = {path = "../draw", default-features = false, features = ["shapes"] }
