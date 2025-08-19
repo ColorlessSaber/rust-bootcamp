@@ -13,8 +13,11 @@ mod auth_utils; // this is referencing the file mod.rs inside folder auth_utils
 // The use statements are to bring objects and or functions in question into scope.
 pub use auth_utils::models::Credentials; // the pub helps re-exporting the Credentials
 use database::Status;
+use rand::{rng, Rng};
 
 pub fn authenticate (creds: Credentials) {
+    let timeout = rng().random_range(100..500);
+    println!("The timeout is {}", timeout);
     if let Status::Connected = database::connect_to_database() {
         auth_utils::login(creds);
     }
