@@ -24,4 +24,5 @@ fn main() {
     let mut r1 = db.borrow_mut();
     //let r2 = db.borrow_mut(); // Will compile but the main thread will panic given we are already have a mutable reference
     r1.max_connections = 200;
+    println!("Hello, world!");
 }
