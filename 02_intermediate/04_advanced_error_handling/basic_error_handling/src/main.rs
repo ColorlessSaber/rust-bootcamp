@@ -1,19 +1,67 @@
 #![allow(dead_code)]
 /*
 Below is an example of how to handle errors and propagate the errors up to fn main().
-One issue with this setup is the both user and developer error reports are "exposed" to the user.
-Also, there is no way to show the error chain to the developer.
  */
-use std::{collections::HashMap, io};
-use std::num::ParseIntError;
+use std::{collections::HashMap, io, error::Error, num::ParseIntError};
+use std::fmt::Display;
 
-fn parse_card_numbers(card: &str) -> Result<Vec<u32>, ParseIntError> {
+struct ParsePaymentInfoError {
+    // We are using a struct in this case for we are looking for contents about the error
+    // than what type of error it is.
+    source: Option<Box<dyn Error>>,
+    msg: String,
+}
+
+impl std::fmt::Debug for ParsePaymentInfoError { // the custom Debug allow us to write better messages to the developer
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{self} \n\t{}", self.msg)?;
+
+        if let Some(e) = self.source.as_ref() {
+            write!(f, "\n\nCaused by:\n\t{e:?}")?;
+        }
+
+        Ok(())
+    }
+}
+
+impl Display for ParsePaymentInfoError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        f.write_str("Parsing payment error: invalid payment info")
+    }
+}
+
+impl Error for ParsePaymentInfoError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        self.source.as_deref()
+    }
+}
+
+/* Below is useful when utilizing From trait, but we cannot use it in this case for
+we need to add a custom message.
+// From trait takes a generic trait we want to convert, this case "ParseIntError"
+impl From<ParseIntError> for ParsePaymentInfoError {
+    fn from(e: ParseIntError) -> Self {
+        ParsePaymentInfoError {
+            source: Some(Box::new(e)),
+            msg: None,
+        }
+    }
+}
+*/
+fn parse_card_numbers(card: &str) -> Result<Vec<u32>, ParsePaymentInfoError> {
     let numbers = card
         .split(" ")
         .map(|s| {
-            s.parse()
+            s.parse().map_err(|_| ParsePaymentInfoError {
+                source: None,
+                msg: format!("{s:?} could not be parsed as u32"),
+            })
         })
-        .collect::<Result<Vec<u32>, _>>()?; // The ? propagates the error
+        .collect::<Result<Vec<u32>, _>>()
+        .map_err(|e| ParsePaymentInfoError {
+            source: Some(Box::new(e)),
+            msg: format!("Failed to parse input as numbers. Input: {card}"),
+        })?; // The ? propagates the error
 
     Ok(numbers)
 }
@@ -31,17 +79,19 @@ struct Card {
     cvv: u32,
 }
 
-fn parse_card(card: &str) -> Result<Card, String> {
-    let mut numbers = parse_card_numbers(card)
-        .map_err(|err| err.to_string())?; // .map_err converts one error type to another
+fn parse_card(card: &str) -> Result<Card, ParsePaymentInfoError> {
+    let mut numbers = parse_card_numbers(card)?; // .map_err converts one error type to another
 
     let len = numbers.len();
     let expected_len = 4;
 
     if len != expected_len {
-        return Err(format!(
-            "Incorrect number of elements parsed. Expected {expected_len} but get {len}. Elements: {numbers:?}."
-        ));
+        return Err(ParsePaymentInfoError {
+            source: None,
+            msg: format!(
+                "Incorrect number of elements parsed. Expected {expected_len} but get {len}. Elements: {numbers:?}."
+            )
+        });
     }
 
     let cvv = numbers.pop().unwrap();
@@ -56,10 +106,33 @@ fn parse_card(card: &str) -> Result<Card, String> {
     })
 }
 
-#[derive(Debug)]
 enum CreditCardError {
     InvalidInput(String),
-    Other(String, String),
+    Other(Box<dyn Error>, String),
+}
+
+impl std::fmt::Debug for CreditCardError { // the custom Debug allow us to write better messages to the developer
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            Self::InvalidInput(msg) => write!(f, "{self}\n{msg}"),
+            Self::Other(e, msg) => write!(f, "{self}\n{msg}\n\nCaused by:\n\t{e:?}"),
+        }
+    }
+}
+
+impl Display for CreditCardError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        f.write_str("Credit card error: Could not retrieve credit card.")
+    }
+}
+
+impl Error for CreditCardError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            CreditCardError::InvalidInput(_) => None,
+            CreditCardError::Other(e, _) => Some(e.as_ref()),
+        }
+    }
 }
 
 fn get_credit_card_info(
@@ -72,7 +145,7 @@ fn get_credit_card_info(
 
     let card = parse_card(card_string)
         .map_err(|e|{
-            CreditCardError::Other(e, format!("{name}'s card could not be parsed."))
+            CreditCardError::Other(Box::new(e), format!("{name}'s card could not be parsed."))
         })?;
 
     Ok(card)
