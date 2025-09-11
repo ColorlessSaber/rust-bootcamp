@@ -63,7 +63,7 @@ In this section of the bootcamp, where I'm currently at, learning more intermedi
 * 02 - Advanced Memory Management: Smart pointers (Box, Rc, RefCell), ellision rules, and concrete and generic lifetimes.
 * 03 - Error Handling: Was taught the difference between unrecoverable, recoverable, and propagating errrors.
 * 04 - Advanced Error Handling: Learned how to create cleaner error messages for user and developer using Rust's built-in traits and create from Crate.io (anyhow, thiserror, and error-stack).
-* 05 - Functional Features: Closures, function pointers, and iterator patterns.
+* 05 - Functional Features: Closures, function pointers, iterator patterns, iterating over collections and combinators.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -73,15 +73,15 @@ Distributed under the MIT License. See 'LICENSE.txt' for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- Conact -->
+<!-- Contact -->
 ## Contact
 Please head to my portfolio website and use the contact form to reach out to me:
 [My Portfolio Website][portfolio-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
+<!-- ACKNOWLEDGEMENTS -->
+## Acknowledgements
 
 * [Choose an Open Source License](https://choosealicense.com)
 * [Img Shields](https://shields.io)
