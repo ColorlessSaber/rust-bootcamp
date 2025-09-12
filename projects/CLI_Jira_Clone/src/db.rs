@@ -1,4 +1,4 @@
-use std::fs;
+use std::{fs, cell::RefCell};
 use anyhow::{anyhow, Result};
 
 use crate::models::{DBState, Epic, Story, Status};
@@ -13,22 +13,67 @@ impl JiraDatabase {
     }
 
     pub fn read_db(&self) -> Result<DBState> {
-        todo!()
+        let database = self.database.read_db()?;
+        Ok(database)
     }
 
     pub fn create_epic(&self, epic: Epic) -> Result<u32> {
-        todo!()
+        let mut database = self.database.read_db()?;
+        database.last_item_id += 1; // increment count when adding new Epic or Story
+        database.epics.insert(database.last_item_id, epic);
+        self.database.write_db(&database)?;
+        Ok(database.last_item_id)
     }
 
     pub fn create_story(&self, story: Story, epic_id: u32) -> Result<u32> {
-        todo!()
+        let mut database = self.database.read_db()?;
+        database.last_item_id += 1; // increment count when adding new Epic or Story
+        database.stories.insert(database.last_item_id, story);
+
+        // Add Story's number to the Epic it's associated with
+        if let Some(epic) = database.epics.get(&epic_id) {
+            let mut updated_epic = epic.clone();
+            updated_epic.stories.push(database.last_item_id);
+
+            // update the same Epic in the database
+           *database.epics.get_mut(&epic_id).unwrap() = updated_epic;
+        } else {
+            return Err(anyhow!("Epic ID {} not found in database.", epic_id))
+        }
+
+        self.database.write_db(&database)?;
+        Ok(database.last_item_id)
     }
 
     pub fn delete_epic(&self, epic_id: u32) -> Result<()> {
-        todo!()
+        /*
+        When an Epic is deleted all Stories associated with it get deleted as well.
+         */
+        let mut database = self.database.read_db()?;
+        if let Some(epic) = database.epics.get(&epic_id) {
+            let stories_associated_with_epic = &epic.stories;
+
+            // delete stories
+            for story_id in stories_associated_with_epic {
+                database.stories.remove(story_id);
+            }
+
+            // delete epic
+            database.epics.remove(&epic_id);
+
+        } else {
+            return Err(anyhow!("Epic ID {} not found in database.", epic_id))
+        }
+        self.database.write_db(&database)?;
+        Ok(())
     }
 
-    pub fn delete_story(&self,epic_id: u32, story_id: u32) -> Result<()> {
+    pub fn delete_story(&self, epic_id: u32, story_id: u32) -> Result<()> {
+        /*
+        When a Story is deleted its id number is removed from the Epic it's associated with.
+         */
+
+
         todo!()
     }
 
