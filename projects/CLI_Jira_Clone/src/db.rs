@@ -31,12 +31,8 @@ impl JiraDatabase {
         database.stories.insert(database.last_item_id, story);
 
         // Add Story's number to the Epic it's associated with
-        if let Some(epic) = database.epics.get(&epic_id) {
-            let mut updated_epic = epic.clone();
-            updated_epic.stories.push(database.last_item_id);
-
-            // update the same Epic in the database
-           *database.epics.get_mut(&epic_id).unwrap() = updated_epic;
+        if let Some(epic) = database.epics.get_mut(&epic_id) {
+            epic.stories.push(database.last_item_id);
         } else {
             return Err(anyhow!("Epic ID {} not found in database.", epic_id))
         }
@@ -50,11 +46,9 @@ impl JiraDatabase {
         When an Epic is deleted all Stories associated with it get deleted as well.
          */
         let mut database = self.database.read_db()?;
-        if let Some(epic) = database.epics.get(&epic_id) {
-            let stories_associated_with_epic = &epic.stories;
-
+        if let Some(epic) = database.epics.get_mut(&epic_id) {
             // delete stories
-            for story_id in stories_associated_with_epic {
+            for story_id in epic.stories.iter() {
                 database.stories.remove(story_id);
             }
 
@@ -72,9 +66,24 @@ impl JiraDatabase {
         /*
         When a Story is deleted its id number is removed from the Epic it's associated with.
          */
+        let mut database = self.database.read_db()?;
+        if let Some(epic) = database.epics.get_mut(&epic_id) {
 
+            // delete Story from it's associated Epic
+            if let Some(story_index) = epic.stories.iter().position(|x| *x == story_id) {
+                epic.stories.remove(story_index);
+            } else {
+                return Err(anyhow!("Story ID {} not found in Epic ID {}.", story_id, epic_id))
+            }
 
-        todo!()
+            // delete story
+            database.stories.remove(&story_id);
+
+        } else {
+            return Err(anyhow!("Epic ID {} not found in database.", epic_id))
+        }
+        self.database.write_db(&database)?;
+        Ok(())
     }
 
     pub fn update_epic_status(&self, epic_id: u32, status: Status) -> Result<()> {
