@@ -24,6 +24,7 @@
         <ul>
             <li><a href="#beginner">Beginner</a></li>
             <li><a href="#intermediate">Intermediate</a></li>
+            <li><a href="#projects">Projects</a></li>
         </ul>
         <li><a href="#license">License</a></li>
         <li><a href="#contact">Contact</a></li>
@@ -64,6 +65,10 @@ In this section of the bootcamp, where I'm currently at, learning more intermedi
 * 03 - Error Handling: Was taught the difference between unrecoverable, recoverable, and propagating errors.
 * 04 - Advanced Error Handling: Learned how to create cleaner error messages for user and developer using Rust's built-in traits and create from Crate.io (anyhow, thiserror, and error-stack).
 * 05 - Functional Features: Closures, function pointers, iterator patterns, iterating over collections and combinators.
+
+### Projects
+#### CLI - Jara Clone
+TBD
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
