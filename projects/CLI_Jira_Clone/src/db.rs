@@ -1,4 +1,4 @@
-use std::{fs, cell::RefCell};
+use std::{fs};
 use anyhow::{anyhow, Result};
 
 use crate::models::{DBState, Epic, Story, Status};
@@ -9,7 +9,9 @@ pub struct JiraDatabase {
 
 impl JiraDatabase {
     pub fn new(file_path: String) -> Self {
-        todo!()
+        Self {
+            database: Box::new(JSONFileDatabase { file_path })
+        }
     }
 
     pub fn read_db(&self) -> Result<DBState> {
@@ -34,7 +36,7 @@ impl JiraDatabase {
         if let Some(epic) = database.epics.get_mut(&epic_id) {
             epic.stories.push(database.last_item_id);
         } else {
-            return Err(anyhow!("Epic ID {} not found in database.", epic_id))
+            return Err(anyhow!("Could not create new Story associated with Epic ID {}.", epic_id))
         }
 
         self.database.write_db(&database)?;
@@ -56,7 +58,7 @@ impl JiraDatabase {
             database.epics.remove(&epic_id);
 
         } else {
-            return Err(anyhow!("Epic ID {} not found in database.", epic_id))
+            return Err(anyhow!("Could not delete Epic ID {} from database for it was not found.", epic_id))
         }
         self.database.write_db(&database)?;
         Ok(())
@@ -73,25 +75,40 @@ impl JiraDatabase {
             if let Some(story_index) = epic.stories.iter().position(|x| *x == story_id) {
                 epic.stories.remove(story_index);
             } else {
-                return Err(anyhow!("Story ID {} not found in Epic ID {}.", story_id, epic_id))
+                return Err(anyhow!("Could not find Story ID {} in Epic ID {} to be deleted.", story_id, epic_id))
             }
 
             // delete story
             database.stories.remove(&story_id);
 
         } else {
-            return Err(anyhow!("Epic ID {} not found in database.", epic_id))
+            return Err(anyhow!("Could not find Epic ID {} in database.", epic_id))
         }
         self.database.write_db(&database)?;
         Ok(())
     }
 
     pub fn update_epic_status(&self, epic_id: u32, status: Status) -> Result<()> {
-        todo!()
+        let mut database = self.database.read_db()?;
+
+        if let Some(epic) = database.epics.get_mut(&epic_id) {
+            epic.status = status;
+        } else {
+            return Err(anyhow!("Could not find Epic ID {} in database to update.", epic_id))
+        }
+        self.database.write_db(&database)?;
+        Ok(())
     }
 
     pub fn update_story_status(&self, story_id: u32, status: Status) -> Result<()> {
-        todo!()
+        let mut database = self.database.read_db()?;
+        if let Some(story) = database.stories.get_mut(&story_id) {
+            story.status = status;
+        } else {
+            return Err(anyhow!("Could not find Story ID {} in database to update.", story_id))
+        }
+        self.database.write_db(&database)?;
+        Ok(())
     }
 }
 
