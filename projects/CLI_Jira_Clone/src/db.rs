@@ -4,7 +4,7 @@ use anyhow::{anyhow, Result};
 use crate::models::{DBState, Epic, Story, Status};
 
 pub struct JiraDatabase {
-    database: Box<dyn Database>
+    pub database: Box<dyn Database>
 }
 
 impl JiraDatabase {
@@ -15,8 +15,7 @@ impl JiraDatabase {
     }
 
     pub fn read_db(&self) -> Result<DBState> {
-        let database = self.database.read_db()?;
-        Ok(database)
+        self.database.read_db()
     }
 
     pub fn create_epic(&self, epic: Epic) -> Result<u32> {
@@ -33,11 +32,7 @@ impl JiraDatabase {
         database.stories.insert(database.last_item_id, story);
 
         // Add Story's number to the Epic it's associated with
-        if let Some(epic) = database.epics.get_mut(&epic_id) {
-            epic.stories.push(database.last_item_id);
-        } else {
-            return Err(anyhow!("Could not create new Story associated with Epic ID {}.", epic_id))
-        }
+        database.epics.get_mut(&epic_id).ok_or_else(|| anyhow!("Could not find Epic in database."))?.stories.push(database.last_item_id);
 
         self.database.write_db(&database)?;
         Ok(database.last_item_id)
@@ -48,18 +43,12 @@ impl JiraDatabase {
         When an Epic is deleted all Stories associated with it get deleted as well.
          */
         let mut database = self.database.read_db()?;
-        if let Some(epic) = database.epics.get_mut(&epic_id) {
-            // delete stories
-            for story_id in epic.stories.iter() {
-                database.stories.remove(story_id);
-            }
-
-            // delete epic
-            database.epics.remove(&epic_id);
-
-        } else {
-            return Err(anyhow!("Could not delete Epic ID {} from database for it was not found.", epic_id))
+        for story_id in &database.epics.get(&epic_id).ok_or_else(|| anyhow!("Could not find Epic in database."))?.stories {
+            database.stories.remove(story_id);
         }
+        // delete epic
+        database.epics.remove(&epic_id);
+
         self.database.write_db(&database)?;
         Ok(())
     }
@@ -69,21 +58,13 @@ impl JiraDatabase {
         When a Story is deleted its id number is removed from the Epic it's associated with.
          */
         let mut database = self.database.read_db()?;
-        if let Some(epic) = database.epics.get_mut(&epic_id) {
 
-            // delete Story from it's associated Epic
-            if let Some(story_index) = epic.stories.iter().position(|x| *x == story_id) {
-                epic.stories.remove(story_index);
-            } else {
-                return Err(anyhow!("Could not find Story ID {} in Epic ID {} to be deleted.", story_id, epic_id))
-            }
+        // delete Story from it's associated Epic
+        let epic = database.epics.get_mut(&epic_id).ok_or_else(|| anyhow!("Could not find Epic in database."))?;
+        let story_index = epic.stories.iter().position(|x| *x == story_id).ok_or_else(|| anyhow!("Could not find Story associated with Epic."))?;
+        epic.stories.remove(story_index);
+        database.stories.remove(&story_id);
 
-            // delete story
-            database.stories.remove(&story_id);
-
-        } else {
-            return Err(anyhow!("Could not find Epic ID {} in database.", epic_id))
-        }
         self.database.write_db(&database)?;
         Ok(())
     }
@@ -91,28 +72,23 @@ impl JiraDatabase {
     pub fn update_epic_status(&self, epic_id: u32, status: Status) -> Result<()> {
         let mut database = self.database.read_db()?;
 
-        if let Some(epic) = database.epics.get_mut(&epic_id) {
-            epic.status = status;
-        } else {
-            return Err(anyhow!("Could not find Epic ID {} in database to update.", epic_id))
-        }
+        database.epics.get_mut(&epic_id).ok_or_else(|| anyhow!("Could not find Epic in database."))?.status = status;
+
         self.database.write_db(&database)?;
         Ok(())
     }
 
     pub fn update_story_status(&self, story_id: u32, status: Status) -> Result<()> {
         let mut database = self.database.read_db()?;
-        if let Some(story) = database.stories.get_mut(&story_id) {
-            story.status = status;
-        } else {
-            return Err(anyhow!("Could not find Story ID {} in database to update.", story_id))
-        }
+
+        database.stories.get_mut(&story_id).ok_or_else(|| anyhow!("Could not find Story in database."))?.status = status;
+
         self.database.write_db(&database)?;
         Ok(())
     }
 }
 
-trait Database {
+pub trait Database {
     fn read_db(&self) -> Result<DBState>;
     fn write_db(&self, db_state: &DBState) -> Result<()>;
 }
