@@ -23,12 +23,18 @@ impl Page for HomePage {
         println!("----------------------------- EPICS -----------------------------");
         println!("     id     |               name               |      status      ");
         let database = self.db.read_db()?;
-        let epics = database.epics.keys().into_iter().sorted().collect_vec();
-        for epic_id in epics {
+        for epic_id in database.epics.keys().into_iter().sorted().collect_vec() {
+            let id = epic_id.to_string();
+            let id_field = get_column_string(id.as_str(), 12);
 
-            todo!()
+            let name = database.epics.get(epic_id).ok_or_else(|| anyhow!("Could not find epic {}", epic_id))?.name.to_string();
+            let name_field = get_column_string(name.as_str(), 34);
+
+            let status = database.epics.get(epic_id).ok_or_else(|| anyhow!("Could not find epic {}", epic_id))?.status.to_string();
+            let status_field = get_column_string(status.as_str(), 18);
+
+            println!("{id_field}|{name_field}|{status_field}");
         }
-        // TODO: print out epics using get_column_string(). also make sure the epics are sorted by id
 
         println!();
         println!();
@@ -39,7 +45,22 @@ impl Page for HomePage {
     }
 
     fn handle_input(&self, input: &str) -> Result<Option<Action>> {
-        todo!() // match against the user input and return the corresponding action. If the user input was invalid return None.
+        let database = self.db.read_db()?;
+        if input == "q" {
+            Ok(Some(Action::Exit))
+        } else if input == "c" {
+            Ok(Some(Action::CreateEpic))
+        } else {
+            if let Ok(value) = input.parse::<u32>() {
+                if let Some(_) = database.epics.get(&value) {
+                    Ok(Some(Action::NavigateToEpicDetail {epic_id: value}))
+                } else {
+                    Ok(None)
+                }
+            } else {
+                Ok(None)
+            }
+        }
     }
 }
 
