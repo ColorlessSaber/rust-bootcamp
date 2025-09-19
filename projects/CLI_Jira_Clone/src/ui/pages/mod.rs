@@ -26,7 +26,7 @@ impl Page for HomePage {
         let epics = self.db.read_db()?.epics;
         for epic_id in epics.keys().sorted() {
             let epic = &epics[epic_id];
-            let id_field = get_column_string(&epic_id.to_string(), 12);
+            let id_field = get_column_string(&epic_id.to_string(), 11);
             let name_field = get_column_string(&epic.name.to_string(), 32);
             let status_field = get_column_string(&epic.status.to_string(), 17);
             println!("{id_field} | {name_field} | {status_field}")

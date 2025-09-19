@@ -68,7 +68,9 @@ In this section of the bootcamp, where I'm currently at, learning more intermedi
 
 ### Projects
 #### CLI - Jara Clone
-TBD
+Created a clone of the Jara software--an industry-standard tool for tracking progress of software projects. The
+terminal style software allows the user to create Epics and Stories. See the README file in the project folder for
+more details.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

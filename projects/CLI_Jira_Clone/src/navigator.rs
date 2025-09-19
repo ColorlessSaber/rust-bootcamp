@@ -13,15 +13,14 @@ pub struct Navigator {
 impl Navigator {
     pub fn new(db: Rc<JiraDatabase>) -> Self {
         Self {
-            pages: vec![Box::new(HomePage {db: db.clone()})],
+            pages: vec![Box::new(HomePage {db: Rc::clone(&db)})],
             prompts: Prompts::new(),
             db
         }
     }
 
     pub fn get_current_page(&self) -> Option<&Box<dyn Page>> {
-        let current_page = self.pages.get(self.pages.len() - 1);
-        current_page
+        self.pages.last()
     }
 
     pub fn handle_action(&mut self, action: Action) -> Result<()> {
