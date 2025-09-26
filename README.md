@@ -59,12 +59,17 @@ Learned the basics of Rust, project structure, and creating unit tests. This sec
 * 06 - Unit Test and Documentation: was taught how to create unit tests and creating documentation.
 
 ### Intermediate
-In this section of the bootcamp, where I'm currently at, learning more intermediate topics of Rust.
+In this section of the bootcamp, learned more intermediate topics of Rust.
 * 01 - Polymorphism: generics and traits, trait objects, super traits, and deriving traits.
 * 02 - Advanced Memory Management: Smart pointers (Box, Rc, RefCell), ellision rules, and concrete and generic lifetimes.
 * 03 - Error Handling: Was taught the difference between unrecoverable, recoverable, and propagating errors.
 * 04 - Advanced Error Handling: Learned how to create cleaner error messages for user and developer using Rust's built-in traits and create from Crate.io (anyhow, thiserror, and error-stack).
 * 05 - Functional Features: Closures, function pointers, iterator patterns, iterating over collections and combinators.
+
+### Advanced
+The advanced Rust topics touched by in the bootcamp are listed below:
+* 01 - Concurrency: Creating threads, passing state amd messages between threads, learned about Tokio Crate, and Streams.
+* 02 - Rust Macros: Declarative Macros, ... (currently here)
 
 ### Projects
 #### CLI - Jara Clone
