@@ -38,7 +38,7 @@ struct Product {
 
 #[log_call(verbose = true)]
 fn buy_product(laptop: Product, price: u32) {
-    // ...
+    println!("buy product with {} at {}", price, laptop.name);
 }
 
 // *** end of attribute like macro ***
