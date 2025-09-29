@@ -1,0 +1,14 @@
+[package]
+name = "attribute_macro"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+proc-macro = true
+# above implicity link our library create with the compliter provided proc macro crate, which will
+# give us all the tools we need to build procedural macros.
+
+[dependencies]
+quote = "1.0.41"
+syn = { version = "2.0.106", features = ["full", "parsing"] }
+darling = "0.21.3"
