@@ -73,7 +73,7 @@ fn generate_verbose_log(fn_name: &Ident, fn_args: Vec<&Ident>) -> Vec<Stmt> {
 
     for arg in fn_args {
         statements.push(parse_quote! {
-            print!("{} = {:?} ", stringify!(#arg), arg);
+            print!("{} = {:?} ", stringify!(#arg), #arg);
         })
     }
 
