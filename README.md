@@ -69,7 +69,7 @@ In this section of the bootcamp, learned more intermediate topics of Rust.
 ### Advanced
 The advanced Rust topics touched by in the bootcamp are listed below:
 * 01 - Concurrency: Creating threads, passing state amd messages between threads, learned about Tokio Crate, and Streams.
-* 02 - Rust Macros: Declarative Macros, ... (currently here)
+* 02 - Rust Macros: Declarative Macros and Procedural Macros.
 
 ### Projects
 #### CLI - Jara Clone
