@@ -1,0 +1,9 @@
+[package]
+name = "ffi_rust_from_c"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+create-type = ["cdylib"] # this tells cargo to compile the code as a shared library, which the C program can call.
+
+[dependencies]
