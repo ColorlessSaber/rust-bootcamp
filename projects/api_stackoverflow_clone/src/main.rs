@@ -1,5 +1,7 @@
-use std::net::SocketAddr;
-
+//use log::*;
+use pretty_env_logger;
+use dotenvy::dotenv;
+use sqlx::postgres::PgPoolOptions;
 use axum::{
     routing::{delete, get, post},
     Router,
@@ -12,6 +14,14 @@ use handlers::*;
 
 #[tokio::main]
 async fn main() {
+    pretty_env_logger::init();
+    dotenv().ok();
+
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&std::env::var("DATABASE_URL").expect("Database URL is not set"))
+        .await.expect("Database connection failed");
+
     let app = Router::new()
         .route("/question", post(create_question))
         .route("/questions", get(read_questions))
