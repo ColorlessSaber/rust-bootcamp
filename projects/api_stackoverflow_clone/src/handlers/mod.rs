@@ -1,3 +1,5 @@
+mod handlers_inner;
+
 use crate::models::*;
 use axum::{response::IntoResponse, Json};
 
@@ -45,6 +47,6 @@ pub async fn read_answers() -> impl IntoResponse {
     }])
 }
 
-pub async fn delete_answer(Json(answer_uuid): Json<AnswerID>) {
+pub async fn delete_answer(Json(answer_uuid): Json<AnswerId>) {
     //..
 }

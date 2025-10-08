@@ -37,7 +37,7 @@ pub struct AnswerDetail {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct AnswerID {
+pub struct AnswerId {
     pub answer_uuid: String,
 }
 
