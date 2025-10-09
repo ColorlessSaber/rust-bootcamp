@@ -10,8 +10,8 @@
 <details>
     <summary>Table of Contents</summary>
     <ol>
-        <li><a href="#project-details">project-details</a></li>
-        <li><a href="#using-software">using-software</a></li>
+        <li><a href="#project-details">Project Details</a></li>
+        <li><a href="#using-software">Using Software</a></li>
     </ol>
 </details>
 <br>

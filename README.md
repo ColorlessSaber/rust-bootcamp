@@ -37,13 +37,15 @@
 ## About the Repo
 This repository contains what I have been learning from the [Let's Get Rusty Bootcamp][rust-bootcamp-url],
 along with projects created in the bootcamp. Please see the section <a href="#Projects Under Repo">Projects Under Repo</a>
-for more details of what I've learned thus far.
+for more details of what I've learned thus far and projects I have accomplished.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- Built With -->
 ## Built With
-* [![Rust][Rust-shield]][rust-url]
+* [![Rust][rust-shield]][rust-url]
+* [![Postgresql][postgresql-shield]][postgresql-url]
+* [![Axum][axum-shield]][axum-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -77,6 +79,12 @@ The advanced Rust topics touched by in the bootcamp are listed below:
 Created a clone of the Jara software--an industry-standard tool for tracking progress of software projects. The
 terminal style software allows the user to create Epics and Stories. See the README file in the project folder for
 more details.
+
+#### API - Stack Overflow Clone
+A clone of the Stack Overflow API. This project allows a person to create new questions and post answers to the
+questions. There is also the option to remove a question and or answer. This project was creating using the Axum crate
+and utilized the Postgres SQL server. 
+See the README file in the project folder for more details.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -116,6 +124,11 @@ Please head to my portfolio website and use the contact form to reach out to me:
 
 [rust-shield]: https://img.shields.io/badge/Rust-000000?style=for-the-badge&logo=Rust&logoColor=white
 [rust-url]: https://www.rust-lang.org
+[postgresql-shield]: https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=PostgreSQL&logoColor=white
+[postgresql-url]: https://www.postgresql.org
+
+[axum-shield]: https://img.shields.io/badge/axum-000000?style=for-the-badge&logoColor=white
+[axum-url]: https://crates.io/crates/axum
 
 [portfolio-url]: https://colorlesssaber.github.io/
 [rust-bootcamp-url]: https://product.letsgetrusty.com/bootcamp-sp?r_done=1
