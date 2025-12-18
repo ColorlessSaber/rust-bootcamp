@@ -3,7 +3,6 @@ use std::sync::Mutex;
 use crate::{sessions::Sessions, users::Users};
 
 use tonic::{Request, Response, Status};
-
 use authentication::auth_server::Auth;
 use authentication::{
     SignInRequest, SignInResponse, SignOutRequest, SignOutResponse, SignUpRequest, SignUpResponse,
@@ -37,27 +36,6 @@ impl AuthService {
 
 #[tonic::async_trait]
 impl Auth for AuthService {
-    async fn sign_in(
-        &self,
-        request: Request<SignInRequest>,
-    ) -> Result<Response<SignInResponse>, Status> {
-        println!("Got a request: {:?}", request);
-
-        let req = request.into_inner();
-
-        let result: Option<String> = todo!(); // Get user's uuid from `users_service`. Panic if the lock is poisoned.
-
-        // Match on `result`. If `result` is `None` return a SignInResponse with a the `status_code` set to `Failure`
-        // and `user_uuid`/`session_token` set to empty strings.
-        let user_uuid: String = todo!();
-
-        let session_token: String = todo!(); // Create new session using `sessions_service`. Panic if the lock is poisoned.
-
-        let reply: SignInResponse = todo!(); // Create a `SignInResponse` with `status_code` set to `Success`
-
-        Ok(Response::new(reply))
-    }
-
     async fn sign_up(
         &self,
         request: Request<SignUpRequest>,
@@ -66,17 +44,66 @@ impl Auth for AuthService {
 
         let req = request.into_inner();
 
-        let result: Result<(), String> = todo!(); // Create a new user through `users_service`. Panic if the lock is poisoned.
+        let result: Result<(), String> = self.users_service
+            .lock()
+            .expect("lock should not be poisoned")
+            .create_user(req.username, req.password); // Create a new user through `users_service`. Panic if the lock is poisoned.
 
-        // TODO: Return a `SignUpResponse` with the appropriate `status_code` based on `result`.
         match result {
             Ok(_) => {
-                todo!()
+                let reply = SignUpResponse {
+                    status_code: StatusCode::Success.into()
+                };
+                Ok(Response::new(reply))
             }
             Err(_) => {
-                todo!()
+                let reply = SignUpResponse {
+                    status_code: StatusCode::Failure.into()
+                };
+                Ok(Response::new(reply))
             }
         }
+    }
+
+    async fn sign_in(
+        &self,
+        request: Request<SignInRequest>,
+    ) -> Result<Response<SignInResponse>, Status> {
+        println!("Got a request: {:?}", request);
+
+        let req = request.into_inner();
+
+        let result: Option<String> = self.users_service
+            .lock()
+            .expect("lock should not be poisoned")
+            .get_user_uuid(req.username, req.password); // Get user's uuid from `users_service`. Panic if the lock is poisoned.
+
+        // Match on `result`. If `result` is `None` return a SignInResponse with a the `status_code` set to `Failure`
+        // and `user_uuid`/`session_token` set to empty strings.
+        let user_uuid: String = match result {
+            Some(uuid) => uuid,
+            None => {
+                let reply = SignInResponse {
+                    status_code: StatusCode::Failure.into(),
+                    user_uuid: "".to_owned(),
+                    session_token: "".to_owned(),
+                };
+                return Ok(Response::new(reply));
+            }
+        };
+
+        let session_token: String = self.sessions_service
+            .lock()
+            .expect("lock should not be poisoned")
+            .create_session(&user_uuid); // Create new session using `sessions_service`. Panic if the lock is poisoned.
+
+        let reply: SignInResponse = SignInResponse {
+            status_code: StatusCode::Success.into(),
+            user_uuid,
+            session_token,
+        }; // Create a `SignInResponse` with `status_code` set to `Success`
+
+        Ok(Response::new(reply))
     }
 
     async fn sign_out(
@@ -88,8 +115,14 @@ impl Auth for AuthService {
         let req = request.into_inner();
 
         // TODO: Delete session using `sessions_service`.
+        self.sessions_service
+            .lock()
+            .expect("lock should not be poisoned")
+            .delete_session(&req.session_token);
 
-        let reply: SignOutResponse = todo!(); // Create `SignOutResponse` with `status_code` set to `Success`
+        let reply: SignOutResponse = SignOutResponse {
+            status_code: StatusCode::Success.into(),
+        }; // Create `SignOutResponse` with `status_code` set to `Success`
 
         Ok(Response::new(reply))
     }
