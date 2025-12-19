@@ -45,6 +45,7 @@ for more details of what I've learned thus far and projects I have accomplished.
 ## Built With
 * [![Rust][rust-shield]][rust-url]
 * [![Postgresql][postgresql-shield]][postgresql-url]
+* [![Docker][docker-shield]][docker-url]
 * [![Axum][axum-shield]][axum-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -77,13 +78,18 @@ The advanced Rust topics touched by in the bootcamp are listed below:
 ### Projects
 #### CLI - Jara Clone
 Created a clone of the Jara software--an industry-standard tool for tracking progress of software projects. The
-terminal style software allows the user to create Epics and Stories. See the README file in the project folder for
-more details.
+terminal style software allows the user to create Epics and Stories. <br>
+See the README file in the project folder for more details.
 
 #### API - Stack Overflow Clone
 A clone of the Stack Overflow API. This project allows a person to create new questions and post answers to the
 questions. There is also the option to remove a question and or answer. This project was creating using the Axum crate
-and utilized the Postgres SQL server. 
+and utilized the Postgres SQL server.<br>
+See the README file in the project folder for more details.
+
+#### Microservice Project
+A simple microservice project that implements an authentication, health-status, and a client CLI. Able to run in the
+terminal or via Docker.<br>
 See the README file in the project folder for more details.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -126,7 +132,8 @@ Please head to my portfolio website and use the contact form to reach out to me:
 [rust-url]: https://www.rust-lang.org
 [postgresql-shield]: https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=PostgreSQL&logoColor=white
 [postgresql-url]: https://www.postgresql.org
-
+[docker-shield]: https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white
+[docker-url]: https://www.docker.com
 [axum-shield]: https://img.shields.io/badge/axum-000000?style=for-the-badge&logoColor=white
 [axum-url]: https://crates.io/crates/axum
 
