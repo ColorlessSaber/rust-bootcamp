@@ -9,9 +9,8 @@ There are three types of procedural macros.
  */
 
 use proc_macro::{TokenStream};
-use quote::{ToTokens};
-use darling::{FromMeta, ast::NestedMeta};
-use syn::{parse_macro_input, ItemFn, parse_quote, Ident, FnArg, Pat, Stmt};
+use darling::{FromMeta, ToTokens};
+use syn::{self, parse_macro_input, AttributeArgs, ItemFn, parse_quote, Ident, FnArg, Pat, Stmt};
 
 // *** attribute like macro ***
 #[derive(Debug, FromMeta)]
@@ -28,12 +27,12 @@ pub fn log_call(args: TokenStream, input: TokenStream) -> TokenStream {
     args are the arguments passed into the attribute.
     input is the item we are annotating.
      */
+    let attr_args = parse_macro_input!(args as AttributeArgs);
     let mut input = parse_macro_input!(input as ItemFn);
 
-    let nested_meta = NestedMeta::parse_meta_list(args.into()).unwrap();
-    let attr_args = match MacroArgs::from_list(&nested_meta) {
+    let attr_args = match MacroArgs::from_list(&attr_args) {
         Ok(v) => v,
-        Err(e) => return e.write_errors().into(),
+        Err(e) => { return TokenStream::from(e.write_errors()); }
     };
 
     impl_log_call(&attr_args, &mut input)

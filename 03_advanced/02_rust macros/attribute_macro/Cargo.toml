@@ -9,6 +9,5 @@ proc-macro = true
 # give us all the tools we need to build procedural macros.
 
 [dependencies]
-quote = "1.0.41"
-syn = { version = "2.0.106", features = ["full", "parsing"] }
-darling = "0.21.3"
+syn = { version = "1.0.109", features = ["full", "parsing"] }
+darling = "0.13.4"
